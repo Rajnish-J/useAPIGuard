@@ -1,198 +1,140 @@
-# 🌟 What You Want to Build
+---
 
-A reusable React hook (like `useIsValidRequest`) that:
+# 🚀 **About This Package**
 
-* Takes an API URL (or maybe a config object)
-* Calls that API for the user
-* Normalizes **all status codes** into a predictable output
-* Removes the need for users to do messy conditional checks
-* Returns:
+This package provides a set of lightweight, type-safe, and developer-friendly React hooks that simplify making API requests in your frontend applications. It removes the repeated boilerplate developers write **every single time** they call an API:
 
-  * A boolean → success or failure
-  * The actual data (if any)
-  * The final status
-  * A message describing success/failure
-  * Maybe a "state" like loading/error/success
+* Fetching
+* Error handling
+* Status checking
+* Zod validation
+* Managing loading, success, and failure states
 
-Basically:
-**You want to centralize API validation + status handling in one place.**
-
-This is absolutely doable.
+Instead of writing the same conditional checks across components, the package delivers one consistent, predictable API response format.
 
 ---
 
-# 🧠 Step-by-Step Plan to Build This
+# 🌟 **Why Developers Need This**
 
-### 1️⃣ Decide the hook input
+### 🧱 1. Eliminates repeated boilerplate
 
-You can support any of these variants:
+Normally, developers must check:
 
-* ✔ Just a URL
-* ✔ URL + config (headers, method, body)
-* ✔ An object (`{ url, method, onSuccess, onError }`)
+```ts
+if (response.ok) { ... }
+else if (status === 404) { ... }
+else if (status === 500) { ... }
+```
 
-Since it's educational, keep it simple first → **accept only URL**.
+And then parse JSON, validate shape, handle errors, track loading state…
 
-Later you can upgrade.
-
----
-
-### 2️⃣ Design the hook output shape
-
-Common pattern:
-
-* `isValid` → boolean
-* `status` → HTTP status
-* `message` → success/failure description
-* `data` → parsed response JSON
-* `loading` → boolean
-* `error` → error object or message
-
-You want to give the consumer a **standard response** so they don’t need if-else everywhere.
+Your hook does *all* of this in one place.
 
 ---
 
-### 3️⃣ Normalize HTTP Responses
+### 🛡️ 2. One unified API response structure
 
-Every backend returns errors differently.
-You want to standardize that.
+Every hook (`useGet`, `usePost`, `usePut`, `usePatch`, `useDelete`) returns:
 
-Example of categories you should treat:
+* `data`
+* `isValid`
+* `status`
+* `loading`
+* `message`
+* `error`
 
-| Category      | Meaning      | What your hook should do               |
-| ------------- | ------------ | -------------------------------------- |
-| `2xx`         | Success      | Mark `isValid = true`, return data     |
-| `4xx`         | Client error | Mark `isValid = false`, extract reason |
-| `5xx`         | Server error | Return “Server is down”, etc.          |
-| Network Error | Fetch fails  | Return "Unable to reach server"        |
-| Invalid JSON  | Bad backend  | Return safe fallback                   |
+No matter which HTTP method is used, the developer always receives the **same stable structure**.
 
-You **don’t** need to hard-code every status code individually.
-Instead, group into categories but provide special messages for common ones like 400, 401, 403, 404, 500.
+This makes API handling extremely predictable.
 
 ---
 
-### 4️⃣ Handle both synchronous + async states
+### 🎯 3. Built-in Zod validation
 
-Your hook will have a `loading` state initially.
+API responses are often inconsistent.
+Developers don’t always trust backend data.
 
-Flow:
+Your package lets them provide a Zod schema:
 
-1. Call API
-2. While fetching → `loading = true`
-3. After response → update state
-4. On error → catch → update state
+```ts
+useGet("/api/user", userSchema)
+```
 
----
+And ensures:
 
-### 5️⃣ Decide how to trigger the API
+* The response matches expected shape
+* Invalid data is caught early
+* TypeScript automatically infers the validated type
 
-Two common patterns:
-
-### Option A — Auto Fetch (runs when URL changes)
-
-Good for simple usecases.
-
-### Option B — Manual Fetch (return a function)
-
-Useful for “button click” triggers.
-
-Start with auto-fetch — easiest.
+This is a huge upgrade in safety and reliability.
 
 ---
 
-### 6️⃣ Add warnings or default messages
+### ⚡ 4. Method-specific hooks for simplicity
 
-If success → “Request completed successfully.”
+Developers don’t need to configure anything:
 
-If fail →
+```ts
+useGet("/api/users")
+usePost("/api/users", body)
+usePut("/api/users/5", body)
+useDelete("/api/users/5")
+```
 
-* 404 → “Resource not found.”
-* 401 → “Unauthorized — login required.”
-* 500 → “Server error. Try again.”
-
-Make them customizable later.
-
----
-
-### 7️⃣ Make the hook resilient
-
-Plan for:
-
-* AbortController (cancelling on unmount)
-* Timeouts
-* Backend returning HTML instead of JSON
-* Slow networks
-* Missing fields
-
-You want your hook to **never crash**, no matter how bad the backend is.
+Each one internally uses the same core logic, so it is consistent, reliable, and easy to understand.
 
 ---
 
-### 8️⃣ Package it for NPM
+### 📦 5. Zero configuration needed
 
-Learn:
+Just install the package and call the hooks.
+No provider, no setup, no context — nothing.
 
-* How to use **tsup** or **vite** for building bundles
-* Exporting ESM + CJS
-* Writing a proper README
-* Adding types (good learning!)
-* Versioning
-* Publishing to NPM
+Perfect for:
 
-This experience alone is priceless.
-
----
-
-# 🌐 Optional: Add Advanced Features Later
-
-After you master v1, you can expand it:
-
-### 🔹 Retry logic
-
-Retry API call 3 times before failing.
-
-### 🔹 Caching
-
-Cache previous responses using localStorage or context.
-
-### 🔹 Auto-refresh
-
-Add a polling interval.
-
-### 🔹 Global error mapping
-
-Let the user override default messages.
-
-### 🔹 Plug-in architecture
-
-Allow users to intercept request/response.
-
-This slowly transforms your project into a **mini Axios alternative + React hook builder**. Amazing learning material.
+* React
+* Next.js
+* Vite
+* CRA
+* Any React environment
 
 ---
 
-# 🎯 Final Summary
+### 🧩 6. Centralized, maintainable logic
 
-You will create:
+Instead of spreading error handlers and status checks across dozens of components, you keep everything in one place:
 
-### 🔸 A reusable custom hook
+✔ One main engine (`useApiGuard`)
+✔ Each method wrapper calls the same logic
+✔ Easy to update, scale, and maintain
 
-That abstracts away API calling and normalizes responses.
+This improves code consistency across the entire team.
 
-### 🔸 A single place where all status codes are handled
+---
 
-So the consumer doesn't write `if (data) …` every time.
+### 🧪 7. Clean cancellation & request safety
 
-### 🔸 A predictable and developer-friendly output
+Your core hook:
 
-Success/failure → `isValid`
-Data → `data`
-State → `loading`
-Error → `message`, `status`
+* Uses `AbortController`
+* Prevents memory leaks
+* Avoids state updates on unmounted components
 
-### 🔸 A small NPM package
+This is the correct, modern way to handle fetch in React.
 
-That teaches you publishing, bundling, and distributing reusable utilities.
+---
+
+# ❤️ **In Short: What This Package Gives Developers**
+
+* Much cleaner code
+* Less repetitive API logic
+* Strong runtime validation
+* Strong TypeScript inference
+* Unified error structure
+* Faster development
+* Fewer bugs
+* Better DX (Developer Experience)
+
+This package essentially becomes a **tiny, elegant, developer-friendly abstraction layer** on top of fetch — perfect for modern React apps.
 
 ---
